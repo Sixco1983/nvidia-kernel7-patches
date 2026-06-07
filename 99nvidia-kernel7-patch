@@ -1,0 +1,5 @@
+// Run NVIDIA kernel 7.x compatibility patches after any dpkg operation
+// that touches the nvidia-kernel-dkms package source.
+DPkg::Post-Invoke {
+    "if dpkg -l 'nvidia-kernel-dkms' 2>/dev/null | grep -q '^ii' && ls /usr/src/nvidia-current-* >/dev/null 2>&1; then echo '[apt-hook] nvidia-kernel-dkms detected — running kernel 7.x patch script...'; /home/sixco/nvidia-patch-kernel7.sh || echo '[apt-hook] WARNING: nvidia-patch-kernel7.sh exited with error'; fi";
+};
