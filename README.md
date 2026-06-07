@@ -45,3 +45,27 @@ When `nvidia-kernel-dkms` is upgraded, dpkg unpacks fresh source (wiping the pat
 - **GPU:** NVIDIA RTX 2070
 - **Driver:** nvidia-current 550.163.01
 - **Kernels:** 6.19.13+parrot7-amd64 and 7.0.9+parrot7-amd64
+
+## Verification (kernel 7.0.9+parrot7-amd64, 2026-06-07)
+
+Booted into kernel 7.0.9 with all patches applied:
+
+```
+$ uname -r
+7.0.9+parrot7-amd64
+
+$ lsmod | grep nvidia | wc -l
+9
+
+$ nvidia-smi --query-gpu=name,driver_version --format=csv,noheader
+NVIDIA GeForce RTX 2070, 550.163.01
+
+$ dkms status
+nvidia-current/550.163.01, 6.19.13+parrot7-amd64, x86_64: installed
+nvidia-current/550.163.01, 7.0.9+parrot7-amd64, x86_64: installed
+
+$ dmesg | grep -i WARN_ON
+(no output — no spurious WARN_ON from drm_connector)
+```
+
+All modules loaded correctly. No errors or warnings in dmesg.
