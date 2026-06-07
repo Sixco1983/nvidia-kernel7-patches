@@ -33,6 +33,12 @@ sudo cp 99nvidia-kernel7-patch /etc/apt/apt.conf.d/
 
 The script is idempotent — safe to run multiple times. It skips already-applied patches and only triggers a DKMS rebuild when something actually changed.
 
+## How the hook handles a failed postinst
+
+When `nvidia-kernel-dkms` is upgraded, dpkg unpacks fresh source (wiping the patches) and runs the postinst, which attempts a DKMS build. The build for kernel 7.x fails without the patches, leaving the package in state `iF` (half-configured).
+
+`DPkg::Post-Invoke` fires regardless of the dpkg exit code. The hook uses `dpkg -s` (not `dpkg -l`) to detect the package, because `dpkg -s` returns output in any installed state — including `iF` — whereas `dpkg -l` only shows `^ii` for fully configured packages. The script then reapplies the patches and rebuilds the DKMS module. Running `dpkg --configure -a` (or the next `apt upgrade`) then resolves the `iF` state cleanly.
+
 ## Tested on
 
 - **OS:** Parrot Security 7.2 (Debian-based)
